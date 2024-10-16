@@ -311,7 +311,14 @@ pub(crate) unsafe fn create_module<'ll>(
                     c"sign-return-address".as_ptr(),
                     pac_ret.is_some().into(),
                 );
-                let pac_opts = pac_ret.unwrap_or(PacRet { leaf: false, key: PAuthKey::A });
+                let pac_opts =
+                    pac_ret.unwrap_or(PacRet { leaf: false, pc: false, key: PAuthKey::A });
+                llvm::LLVMRustAddModuleFlagU32(
+                    llmod,
+                    llvm::LLVMModFlagBehavior::Min,
+                    c"branch-protection-pauth-lr".as_ptr(),
+                    pac_opts.pc.into(),
+                );
                 llvm::LLVMRustAddModuleFlagU32(
                     llmod,
                     llvm::LLVMModFlagBehavior::Min,
